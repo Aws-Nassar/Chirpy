@@ -8,11 +8,11 @@ const app = express();
 const PORT = 8080;
 
 app.use(middlewareLogResponse);
-app.get("/healthz", handlerReadiness);
+app.get("/api/healthz", handlerReadiness);
 app.use("/app", middlewareMetricsInc);
 app.use("/app", express.static("./src/app"));
-app.get("/metrics", handlerHits);
-app.get("/reset", handlerReset);
+app.get("/api/metrics", handlerHits);
+app.get("/api/reset", handlerReset);
 
 
 app.listen(PORT, () => {
