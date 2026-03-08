@@ -25,7 +25,17 @@ export async function handlerChirpsValidate(req: Request, res: Response) {
     return;
   }
 
+  const profaneWords: string[] = ['kerfuffle', 'sharbert', 'fornax'];
+  const cleanBody: Array<string> =  body.split(" ");
+  
+  for ( let i = 0; i < cleanBody.length; i++) {
+    if (profaneWords.includes(cleanBody[i].toLowerCase())) {
+      cleanBody[i] = "****";
+    }
+  }
+  
+
   respondWithJSON(res, 200, {
-    valid: true,
+    cleanedBody: cleanBody.join(" "),
   });
 }
