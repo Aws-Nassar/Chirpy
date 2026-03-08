@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
+import { BadRequestError } from "./errors.js";
 
+
+
+/*
 export function respondWithError(res: Response, code: number, message: string) {
   respondWithJSON(res, code, { error: message });
-}
+}*/ // Not used
 
 export function respondWithJSON(res: Response, code: number, payload: any) {
   res.header("Content-Type", "application/json");
@@ -11,17 +15,15 @@ export function respondWithJSON(res: Response, code: number, payload: any) {
 }
 
 export async function handlerChirpsValidate(req: Request, res: Response) {
-  // The middleware has already parsed the JSON for us!
   const { body } = req.body;
 
   if (!body) {
-    respondWithError(res, 400, "Missing body");
-    return;
+    throw new BadRequestError("Missing body");
   }
 
   const maxChirpLength = 140;
   if (body.length > maxChirpLength) {
-    throw new Error("Chirp is too long");
+    throw new BadRequestError("Chirp is too long. Max length is 140");
   }
 
   const profaneWords: string[] = ['kerfuffle', 'sharbert', 'fornax'];
