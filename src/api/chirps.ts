@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
-import { createChirp } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps } from "../db/queries/chirps.js";
 
 export async function handlerCreateChirps(req: Request, res: Response) {
   const { body,userId } = req.body;
@@ -46,4 +46,25 @@ export async function handlerCreateChirps(req: Request, res: Response) {
   "body": result.body,
   "userId": result.userId
   });
+}
+
+export async function handlerGetAllChirps(req: Request, res: Response) {
+  const results = await getAllChirps();
+
+  if (!results) {
+    throw new Error("Error happen while we get all the chirps.")
+  }
+
+  let chirpsArray = [];
+  for (let i = 0; i < results.length; i++) {
+    chirpsArray.push({
+      "id": results[i].id,
+      "createdAt": results[i].createdAt,
+      "updatedAt": results[i].updatedAt,
+      "body": results[i].body,
+      "userId": results[i].userId
+    });
+  }
+
+  respondWithJSON(res, 200, chirpsArray);
 }
