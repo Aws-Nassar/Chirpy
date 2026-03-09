@@ -11,6 +11,7 @@ type DBConfig = {
 
 type APIConfig = {
   fileServerHits: number;
+  platform: string;
 };
 
 process.loadEnvFile();
@@ -23,6 +24,7 @@ type Config = {
 export const config: Config = {
   api: {
     fileServerHits: 0,
+    platform: envOrThrow("PLATFORM"),
   },
   db: {
     url: envOrThrow("DB_URL"),

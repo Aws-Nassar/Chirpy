@@ -1,18 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "./errors.js";
-
-
-
-/*
-export function respondWithError(res: Response, code: number, message: string) {
-  respondWithJSON(res, code, { error: message });
-}*/ // Not used
-
-export function respondWithJSON(res: Response, code: number, payload: any) {
-  res.header("Content-Type", "application/json");
-  const body = JSON.stringify(payload);
-  res.status(code).send(body);
-}
+import { respondWithJSON } from "./json.js";
 
 export async function handlerChirpsValidate(req: Request, res: Response) {
   const { body } = req.body;
@@ -35,7 +23,6 @@ export async function handlerChirpsValidate(req: Request, res: Response) {
     }
   }
   
-
   respondWithJSON(res, 200, {
     cleanedBody: cleanBody.join(" "),
   });
