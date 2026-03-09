@@ -8,6 +8,13 @@
       "when": 1773063546086,
       "tag": "0000_milky_red_wolf",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773087580359,
+      "tag": "0001_smiling_hawkeye",
+      "breakpoints": true
     }
   ]
 }
