@@ -12,7 +12,7 @@ import { BadRequestError, UnauthorizedError, NotFoundError, ForbiddenError } fro
 }*/ // Not used
 
 export function middlewareMetricsInc (req: Request, res: Response, next: NextFunction) {
-    config.fileServerHits++;
+    config.api.fileServerHits++;
     next();
 }
 
