@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { BadRequestError } from "./errors.js";
+import { BadRequestError, NotFoundError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
-import { createChirp, getAllChirps } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
 
 export async function handlerCreateChirps(req: Request, res: Response) {
   const { body,userId } = req.body;
@@ -40,11 +40,11 @@ export async function handlerCreateChirps(req: Request, res: Response) {
   }
   
   respondWithJSON(res, 201, {
-  "id": result.id,
-  "createdAt": result.createdAt,
-  "updatedAt": result.updatedAt,
-  "body": result.body,
-  "userId": result.userId
+    "id": result.id,
+    "createdAt": result.createdAt,
+    "updatedAt": result.updatedAt,
+    "body": result.body,
+    "userId": result.userId
   });
 }
 
@@ -67,4 +67,26 @@ export async function handlerGetAllChirps(req: Request, res: Response) {
   }
 
   respondWithJSON(res, 200, chirpsArray);
+}
+
+export async function handlerGetChirpById(req: Request, res: Response,) {
+  const { chirpId } = req.params;
+
+  if (typeof chirpId !== 'string') {
+      throw new NotFoundError("Missing chirpId parameter.");
+  }
+
+  const result = await getChirpById(chirpId);
+
+  if (!result) {
+    throw new NotFoundError("Error happen while we get the needed chirp.");
+  }
+
+  respondWithJSON(res, 200, {
+    "id": result.id,
+    "createdAt": result.createdAt,
+    "updatedAt": result.updatedAt,
+    "body": result.body,
+    "userId": result.userId
+  });
 }
