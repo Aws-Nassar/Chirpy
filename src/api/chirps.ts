@@ -2,17 +2,19 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "../auth.js"
+import { config } from "../config.js";
 
 export async function handlerCreateChirps(req: Request, res: Response) {
-  const { body,userId } = req.body;
+  const { body } = req.body;
 
   if (!body) {
     throw new BadRequestError("Missing body");
   }
 
-  if (!userId) {
-    throw new BadRequestError("Missing userId");
-  }
+  const tokenString = getBearerToken(req);
+
+  const userId = validateJWT(tokenString, config.jwt.secret)
 
   const maxChirpLength = 140;
   if (body.length > maxChirpLength) {

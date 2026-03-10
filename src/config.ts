@@ -14,11 +14,16 @@ type APIConfig = {
   platform: string;
 };
 
+type JWTConfig = {
+  secret: string;
+}
+
 process.loadEnvFile();
 
 type Config = {
   api: APIConfig;
   db: DBConfig;
+  jwt: JWTConfig;
 }
 
 export const config: Config = {
@@ -29,6 +34,9 @@ export const config: Config = {
   db: {
     url: envOrThrow("DB_URL"),
     migrationConfig: migrationConfig
+  },
+  jwt: {
+    secret: envOrThrow("JWT_SECRET"),
   }
 };
 

@@ -1,7 +1,8 @@
 import * as argon2 from "argon2";
-import { toSnakeCase } from "drizzle-orm/casing";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
+import { Request } from "express";
+import { UnauthorizedError } from "./api/errors.js";
 
 type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -26,7 +27,7 @@ export async function checkPasswordHash(password: string, hash: string): Promise
     }
 }
 
-export function makeJWT(userID: string, expiresIn: number, secret: string): string {
+export function makeJWT(userID: string, secret: string, expiresIn: number): string {
     const payload: Payload = {
         iss: "chirpy",
         sub: userID,
@@ -53,4 +54,18 @@ export function validateJWT(tokenString: string, secret: string): string {
     } catch(err) {
         throw new Error("Invalid token payload");
     }
+}
+
+export function getBearerToken(req: Request): string {
+    const auth = req.get('Authorization');
+
+    if (!auth) {
+        throw new UnauthorizedError("Failed to get Authorization")
+    }
+    
+    const tokenString = auth.replace("Bearer ", "").trim();
+    if (!tokenString || tokenString.length === 0) {
+        throw new UnauthorizedError("Failed to get Authorization")
+    }
+    return tokenString;
 }
