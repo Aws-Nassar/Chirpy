@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { BadRequestError, UnauthorizedError } from "./errors.js";
-import { createUser, getUserByEmail } from "../db/queries/users.js";
+import { createUser, getUserByEmail, updateUser } from "../db/queries/users.js";
 import { respondWithJSON } from "./json.js";
 import { NewUser } from "../db/schema.js";
-import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken } from "../auth.js"
+import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken, getBearerToken, validateJWT } from "../auth.js"
 import { config } from "../config.js";
 import { saveRefreshToken } from "../db/queries/refresh.js";
 
@@ -80,3 +80,36 @@ export async function handlerUserLogin(req: Request, res: Response) {
     
     respondWithJSON(res, 200, response);    
 }
+
+export async function handlerUpdateUser(req: Request, res: Response) {
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.jwt.secret);
+    
+    const { email, password } = req.body;
+
+    if (!email || email.length === 0) {
+        throw new BadRequestError("Missing email");
+    }
+
+    if (!password || password.length === 0) {
+        throw new BadRequestError("Missing password");
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const result = await updateUser(userId, email, hashedPassword);
+    
+    if (!result) {
+        throw new Error("Error could not find the user ID.");
+    }
+    
+    const response: UserResponse = {
+        id: result.id,
+        email: result.email,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
+    }
+    
+    respondWithJSON(res, 200, response);
+}
+
