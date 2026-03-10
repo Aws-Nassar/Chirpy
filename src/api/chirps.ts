@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
-import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps, getChirpById, deleteChirp } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js"
 import { config } from "../config.js";
 
@@ -14,7 +14,7 @@ export async function handlerCreateChirps(req: Request, res: Response) {
 
   const tokenString = getBearerToken(req);
 
-  const userId = validateJWT(tokenString, config.jwt.secret)
+  const userId = validateJWT(tokenString, config.jwt.secret);
 
   const maxChirpLength = 140;
   if (body.length > maxChirpLength) {
@@ -75,7 +75,7 @@ export async function handlerGetChirpById(req: Request, res: Response,) {
   const { chirpId } = req.params;
 
   if (typeof chirpId !== 'string') {
-      throw new NotFoundError("Missing chirpId parameter.");
+      throw new BadRequestError("Missing chirpId parameter.");
   }
 
   const result = await getChirpById(chirpId);
@@ -92,3 +92,29 @@ export async function handlerGetChirpById(req: Request, res: Response,) {
     "userId": result.userId
   });
 }
+
+export async function handlerDeleteChirp(req: Request, res: Response) {
+  const { chirpId } = req.params;
+
+  if (typeof chirpId !== 'string') {
+      throw new BadRequestError("Missing chirpId parameter.");
+  }
+
+  const tokenString = getBearerToken(req);
+
+  const userId = validateJWT(tokenString, config.jwt.secret);
+
+  const chirp = await getChirpById(chirpId);
+
+  if (!chirp) {
+    throw new NotFoundError("Error happen while we get the needed chirp.");
+  }
+
+  if (chirp.userId !== userId) {
+    throw new ForbiddenError("You are not the author of this chirp.");
+  }
+  
+  const result = await deleteChirp(chirpId);
+  res.status(204).send();
+}
+
