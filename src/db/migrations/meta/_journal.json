@@ -15,6 +15,13 @@
       "when": 1773087580359,
       "tag": "0001_smiling_hawkeye",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773097438005,
+      "tag": "0002_loose_tempest",
+      "breakpoints": true
     }
   ]
 }
