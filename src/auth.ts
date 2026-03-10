@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 import { UnauthorizedError } from "./api/errors.js";
+import crypto from "crypto"
 
 type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -27,7 +28,7 @@ export async function checkPasswordHash(password: string, hash: string): Promise
     }
 }
 
-export function makeJWT(userID: string, secret: string, expiresIn: number): string {
+export function makeJWT(userID: string, expiresIn: number, secret: string): string {
     const payload: Payload = {
         iss: "chirpy",
         sub: userID,
@@ -43,16 +44,16 @@ export function validateJWT(tokenString: string, secret: string): string {
         const decoded = jwt.verify(tokenString, secret) as JwtPayload;
         
         if (typeof decoded === "string") {
-            throw new Error("Invalid token payload");
+            throw new UnauthorizedError("Invalid token payload");
         }
 
         if (typeof decoded.sub === "undefined") {
-            throw new Error("Invalid token payload");
+            throw new UnauthorizedError("Invalid token payload");
         }
 
         return decoded.sub;
     } catch(err) {
-        throw new Error("Invalid token payload");
+        throw new UnauthorizedError("Invalid token payload");
     }
 }
 
@@ -68,4 +69,8 @@ export function getBearerToken(req: Request): string {
         throw new UnauthorizedError("Failed to get Authorization")
     }
     return tokenString;
+}
+
+export function makeRefreshToken() {
+    return crypto.randomBytes(32).toString('hex')
 }

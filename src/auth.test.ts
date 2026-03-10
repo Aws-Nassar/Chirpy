@@ -24,7 +24,7 @@ describe("token", () => {
   let hash1: string;
 
   beforeAll( () => {
-    hash1 =  makeJWT("1242435", password1, 3600);
+    hash1 =  makeJWT("1242435", 3600, password1);
   });
 
   it("should return true for the correct password", () => {

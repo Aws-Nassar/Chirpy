@@ -16,6 +16,8 @@ type APIConfig = {
 
 type JWTConfig = {
   secret: string;
+  defaultDuration: number;
+  refreshDuration: number;
 }
 
 process.loadEnvFile();
@@ -37,6 +39,8 @@ export const config: Config = {
   },
   jwt: {
     secret: envOrThrow("JWT_SECRET"),
+    defaultDuration: 3600,
+    refreshDuration: 5184000
   }
 };
 

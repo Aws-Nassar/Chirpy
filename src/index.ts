@@ -9,6 +9,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
 import { handlerCreateUser, handlerUserLogin } from "./api/users.js";
+import { handlerRefresh, handlerRevoke } from "./api/refresh.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -42,6 +43,12 @@ app.get("/api/chirps", (req, res, next) => {
 });
 app.get("/api/chirps/:chirpId", (req, res, next) => {
    Promise.resolve(handlerGetChirpById(req, res)).catch(next);
+});
+app.post("/api/refresh", (req, res, next) => {
+   Promise.resolve(handlerRefresh(req, res)).catch(next);
+});
+app.post("/api/revoke", (req, res, next) => {
+   Promise.resolve(handlerRevoke(req, res)).catch(next);
 });
 
 app.use(errorMiddleWare);
