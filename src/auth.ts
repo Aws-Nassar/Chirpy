@@ -60,11 +60,11 @@ export function validateJWT(tokenString: string, secret: string): string {
 export function getBearerToken(req: Request): string {
     const auth = req.get('Authorization');
 
-    if (!auth) {
+    if (!auth || !auth.startsWith("Bearer ")) {
         throw new UnauthorizedError("Failed to get Authorization")
     }
     
-    const tokenString = auth.replace("Bearer ", "").trim();
+    const tokenString = auth.slice("Bearer ".length).trim();
     if (!tokenString || tokenString.length === 0) {
         throw new UnauthorizedError("Failed to get Authorization")
     }
@@ -73,4 +73,17 @@ export function getBearerToken(req: Request): string {
 
 export function makeRefreshToken() {
     return crypto.randomBytes(32).toString('hex')
+}
+
+export function getAPIKey(req: Request) {
+    const auth = req.get('Authorization');
+    if (!auth || !auth.startsWith("ApiKey ")) {
+        throw new UnauthorizedError("Failed to get Authorization")
+    }
+
+    const apiKey = auth.slice("ApiKey ".length).trim();
+    if (!apiKey || apiKey.length === 0) {
+        throw new UnauthorizedError("Failed to get ApiKey")
+    }
+    return apiKey;
 }
