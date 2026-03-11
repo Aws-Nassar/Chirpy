@@ -57,6 +57,12 @@ export async function handlerChirpsRetrieve(req: Request, res: Response) {
     authorId = authorIdQuery;
   }
 
+  let sort = "";
+  let sortQuery = req.query.sort;
+  if (typeof sortQuery === "string") {
+    sort = sortQuery;
+  }
+
   const results = await getChirps(authorId);
 
   if (!results) {
@@ -64,7 +70,12 @@ export async function handlerChirpsRetrieve(req: Request, res: Response) {
   }
 
   let chirpsArray = [];
-  for (let i = 0; i < results.length; i++) {
+  
+  const start = sort === "desc" ? results.length - 1 : 0;
+  const end = sort === "desc" ? -1 : results.length;
+  const step = sort === "desc" ? -1 : 1;
+
+  for (let i = start; i !== end; i += step) {
     chirpsArray.push({
       "id": results[i].id,
       "createdAt": results[i].createdAt,
