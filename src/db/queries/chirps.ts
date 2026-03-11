@@ -11,10 +11,11 @@ export async function createChirp(chirp: NewChirp) {
   return result;
 }
 
-export async function getAllChirps() {
+export async function getChirps(userId?: string) {
   const results = await db
     .select()
     .from(chirps)
+    .where(userId ? eq(chirps.userId, userId) : undefined)
     .orderBy(asc(chirps.createdAt));
   return results;
 }
