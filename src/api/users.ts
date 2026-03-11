@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequestError, UnauthorizedError } from "./errors.js";
-import { createUser, getUserByEmail, updateUser } from "../db/queries/users.js";
+import { createUser, getUserByEmail, updateUser, upgradeChirpyRed } from "../db/queries/users.js";
 import { respondWithJSON } from "./json.js";
 import { NewUser } from "../db/schema.js";
 import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken, getBearerToken, validateJWT } from "../auth.js"
@@ -32,6 +32,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
         email: result.email,
         createdAt: result.createdAt,
         updatedAt: result.updatedAt,
+        isChirpyRed: result.isChirpyRed,
     }
     
     respondWithJSON(res, 201, response);
@@ -76,6 +77,7 @@ export async function handlerUserLogin(req: Request, res: Response) {
         email: user.email,
         token: token,
         refreshToken: refreshToken,
+        isChirpyRed: user.isChirpyRed,
     }
     
     respondWithJSON(res, 200, response);    
@@ -113,3 +115,23 @@ export async function handlerUpdateUser(req: Request, res: Response) {
     respondWithJSON(res, 200, response);
 }
 
+export async function handlerUpgradeChirpyRed(req: Request, res: Response) {
+    const { event, data } = req.body;
+
+    if (event !== "user.upgraded") {
+        res.status(204).send();
+        return;
+    }
+    
+    if (!data || !data.userId) {
+        throw new BadRequestError("Missing user ID.");
+    }
+
+    const result = await upgradeChirpyRed(data.userId);
+
+    if (!result) {
+        res.status(404).send();
+        return;
+    }
+    res.status(204).send();
+}

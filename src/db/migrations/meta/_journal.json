@@ -29,6 +29,20 @@
       "when": 1773173627641,
       "tag": "0003_faulty_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773187278143,
+      "tag": "0004_open_sinister_six",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773188579866,
+      "tag": "0005_lumpy_tana_nile",
+      "breakpoints": true
     }
   ]
 }
